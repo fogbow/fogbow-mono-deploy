@@ -1,4 +1,4 @@
-# fogbow-deploy
+# Fogbow-Deploy
 
 ## Description 
 This repository was made to simplify Fogbow Installation. To install using those Ansible playbooks, we need to install the following dependency:
