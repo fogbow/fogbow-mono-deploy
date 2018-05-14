@@ -9,7 +9,7 @@ Now, we have to edit hosts file, filling the IP where yout want to install each 
  
 \[fogbow-manager\]
    
-<Manager VM IP>
+\<Manager VM IP\>
    
 \[fogbow-manager:vars\]
    
