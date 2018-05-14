@@ -1,0 +1,5 @@
+---
+- include: fogbow-manager-install.yml
+- include: fogbow-rendezvous-install.yml
+- include: fogbow-reverse-tunnel-install.yml
+- include: fogbow-xmpp-install.yml

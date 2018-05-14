@@ -1,0 +1,38 @@
+---
+- hosts: fogbow-manager
+  vars:
+    manager_repository: https://github.com/fogbow/fogbow-manager-core.git
+    manager_path: /home/ubuntu/fogbow-components/fogbow-manager/
+    stable_branch: create-compute
+    conf_src_path: confs/manager/
+    manager_file: manager.conf
+    infrasctructure_file: infrastructure.conf
+    federation_file: federation.conf
+    manager_runner: nohup bash mvnw spring-boot:run >/dev/null 2>&1 & #We must change this runner to the new one
+  tasks:
+    - name: Install dependencies
+      become: yes
+      include: install-dependencies.yml
+
+    - name: Download fogbow repository
+      git:
+        repo: "{{ manager_repository }}"
+        dest: "{{ manager_path }}"
+        version: "{{ stable_branch }}"
+
+    - name: Maven installing Fogbow Manager
+      shell: mvn -f {{ manager_path }} install -DskipTests
+
+    - name: Copy Manager configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ manager_path }}"
+      with_fileglob:
+        - "{{ conf_src_path }}/{{ manager_file }}"
+        - "{{ conf_src_path }}/{{ infrasctructure_file }}"
+        - "{{ conf_src_path }}/{{ federation_file }}"
+
+    - name: Run Fogbow-Manager
+      shell: "{{ manager_runner }}"
+      args:
+        chdir: "{{ manager_path }}"

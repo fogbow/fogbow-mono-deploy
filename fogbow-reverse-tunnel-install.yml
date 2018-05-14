@@ -1,0 +1,53 @@
+---
+- hosts: fogbow-reverse-tunnel
+  vars:
+    tunnel_zip_url: https://github.com/fogbow/fogbow-reverse-tunnel/archive/master.zip
+    rt_path: /home/ubuntu/fogbow-components/fogbow-reverse-tunnel-master/
+    components_path: /home/ubuntu/fogbow-components/
+    conf_src_path: confs/reverse-tunnel/
+    rt_conf_file: reverse-tunnel.conf
+    log4j_conf_file: log4j.properties
+    rt_starter: nohup java -Dlog4j.configuration=file:log4j.properties -jar target/fogbow-reverse-tunnel-0.0.1-SNAPSHOT-jar-with-dependencies.jar reverse-tunnel.conf >/dev/null 2>&1 &
+  tasks:
+    - name: Install dependencies
+      become: yes
+      include: install-dependencies.yml
+
+    - name: Install unzip
+      become: yes
+      apt: name=unzip state=present
+
+    - name: Creates Reverse Tunnel directory
+      file: path={{ rt_path }} state=directory
+
+    - name: Download Reverse Tunnel source
+      get_url:
+        url: "{{ tunnel_zip_url }}"
+        dest: "{{ components_path }}master.zip"
+
+    - name: Decompreesing
+      unarchive:
+        remote_src: yes
+        src: "{{ components_path }}master.zip"
+        dest: "{{ components_path }}"
+
+    - name: Changing file mode
+      file: 
+        path: "{{ rt_path }}/start-tunnel-server"
+        mode: +x
+
+    - name: Maven installing Fogbow Reverse Tunnel
+      shell: mvn -f {{ rt_path }} install -DskipTests
+
+    - name: Copy Reverse Tunnel configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ rt_path }}"
+      with_fileglob:
+        - "{{ conf_src_path }}/{{ rt_conf_file }}"
+        - "{{ conf_src_path }}/{{ log4j_conf_file }}"
+
+    - name: Run Fogbow Reverse Tunnel
+      shell: "{{ rt_starter }}"
+      args:
+        chdir: "{{ rt_path }}"

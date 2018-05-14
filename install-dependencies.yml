@@ -1,0 +1,7 @@
+- name: Installing Maven and Git
+  apt: pkg={{ item }} state=latest update_cache=yes cache_valid_time=3600
+  with_items:
+    - maven
+    - git
+- name: Installing JDK 8
+  include: jdk8-install.yml

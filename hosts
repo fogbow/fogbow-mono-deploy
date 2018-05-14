@@ -1,0 +1,26 @@
+[localhost]
+127.0.0.1
+
+[fogbow-manager]
+# Manager VM IP
+[fogbow-manager:vars]
+ansible_ssh_private_key_file=
+ansible_python_interpreter=/usr/bin/python3
+
+[fogbow-rendezvous]
+# Rendezvous VM IP
+[fogbow-rendezvous:vars] 
+ansible_ssh_private_key_file=
+ansible_python_interpreter=/usr/bin/python3
+
+[fogbow-reverse-tunnel]
+# Reverse Tunnel VM IP
+[fogbow-reverse-tunnel:vars]
+ansible_ssh_private_key_file=
+ansible_python_interpreter=/usr/bin/python3
+
+[fogbow-xmpp]
+# XMPP VM IP
+[fogbow-xmpp:vars]
+ansible_ssh_private_key_file=
+ansible_python_interpreter=/usr/bin/python3

@@ -1,0 +1,37 @@
+---
+- hosts: fogbow-rendezvous
+  vars:
+    rendezvous_repository: https://github.com/fogbow/fogbow-rendezvous.git
+    rendezvous_path: /home/ubuntu/fogbow-components/fogbow-rendezvous/
+    stable_branch: develop
+    conf_src_path: confs/rendezvous/
+    rendezvous_file: rendezvous.conf
+    log4j_file: log4j.properties
+    rendezvous_runner: nohup java -Dlog4j.configuration=file:log4j.properties -cp target/rendezvous-0.0.1-SNAPSHOT.jar:target/lib/* org.fogbowcloud.rendezvous.xmpp.Main rendezvous.conf >/dev/null 2>&1 &
+  tasks:
+    - name: Install dependencies
+      become: yes
+      include: install-dependencies.yml
+
+    - name: Download Rendezvous repository
+      git:
+        repo: "{{ rendezvous_repository }}"
+        dest: "{{ rendezvous_path }}"
+        version: "{{ stable_branch }}"
+
+    - name: Maven installing Fogbow Rendezvous
+      shell: mvn -f {{ rendezvous_path }} install -DskipTests
+
+    - name: Copy Rendezvous configuration files
+      copy:
+        src: "{{ item }}"
+        dest: "{{ rendezvous_path }}"
+      with_fileglob:
+        - "{{ conf_src_path }}/{{ rendezvous_file }}"
+        - "{{ conf_src_path }}/{{ log4j_file }}"
+
+    - name: Run Fogbow-Rendezvous
+      shell: "{{ rendezvous_runner }}"
+      args:
+        chdir: "{{ rendezvous_path }}"
+
